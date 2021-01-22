@@ -1,0 +1,34 @@
+service: personal-site
+
+frameworkVersion: '2'
+
+plugins:
+  - serverless-s3-sync
+  - serverless-certificate-creator
+
+provider:
+  name: aws
+  stage: dev
+  region: us-west-2
+  runtime: nodejs12.x
+
+package:
+  exclude:
+    - ./**
+
+custom:
+  domain: ${file(../config.json):domain}
+  zoneId: ${file(../config.json):domainHostedZoneId}
+  zoneId: ${file(../config.json):cloudfrontHostedZoneId}
+  s3Sync:
+    - bucketName: ${self:custom.domain}
+      localDir: build
+  customCertificate:
+    certificateName: ${self:custom.domain}
+    hostedZoneIds: ${self:custom.zoneId}
+
+resources:
+  - ${file(resources/cloudfront.yml)}
+  - ${file(resources/route53.yml)}
+  - ${file(resources/s3.yml)}
+

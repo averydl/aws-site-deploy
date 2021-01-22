@@ -1,0 +1,35 @@
+Resources:
+  CloudFrontOAI:
+    Type: AWS::CloudFront::CloudFrontOriginAccessIdentity
+    Properties:
+      CloudFrontOriginAccessIdentityConfig:
+        Comment: "CloudFront OAI"
+  CloudFrontDistribution:
+    Type: AWS::CloudFront::Distribution
+    Properties:
+      DistributionConfig:
+        Enabled: true
+        PriceClass: PriceClass_100
+        DefaultRootObject: index.html
+        Logging:
+          Bucket: !GetAtt SiteLogBucket.DomainName
+          IncludeCookies: true
+          Prefix: logs/cloudfront/
+        DefaultCacheBehavior:
+          CachePolicyId: 658327ea-f89d-4fab-a63d-7e88639e58f6 # Managed-CachingOptimized
+          ViewerProtocolPolicy: redirect-to-https
+          TargetOriginId: ${self:service}-s3-origin
+        Aliases:
+          - averydl.com
+        ViewerCertificate:
+          AcmCertificateArn: ${certificate:${self:custom.customCertificate.certificateName}:CertificateArn}
+          SslSupportMethod: sni-only
+        Origins:
+          - Id: ${self:service}-s3-origin
+            DomainName: !GetAtt SiteBucket.DomainName
+            S3OriginConfig:
+              OriginAccessIdentity:
+                Fn::Join:
+                  - ""
+                  - - 'origin-access-identity/cloudfront/'
+                    - !Ref CloudFrontOAI
