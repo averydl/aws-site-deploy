@@ -20,7 +20,6 @@
   "homepage": "https://github.com/averydl/aws-site-deploy#readme",
   "devDependencies": {
     "prompt": "^1.1.0",
-    "serverless": "^2.20.0",
     "serverless-certificate-creator": "^1.4.0",
     "serverless-s3-sync": "^1.15.0"
   }
