@@ -9,13 +9,24 @@ var configSchema = {
     properties: {
         overwrite: {
             description: colors.red(`a file ${fName} already exists - do you want to overwrite it? (y/n)`),
-            pattern: '[yn]{1}',
+            pattern: '^[yn]{1}$',
             message: colors.yellow('please enter "y" for yes, or "n" for "no"'),
             ask: () => {return fs.existsSync(fName)},
-        },
-        projectname: {
-            description: 'the name of this serverless project (e.g. personal-site)\nrequired',
             required: true,
+        },
+        servicename: {
+            description: 'the name of this serverless project stack (e.g. personal-site)\nrequired',
+            required: true,
+            ask: () => {return !prompt.history('overwrite') || prompt.history('overwrite').value != 'n'},
+        },
+        buildpath: {
+            description: 'path to the directory of your static website (e.g. build)\nrequired',
+            required: true,
+            ask: () => {return !prompt.history('overwrite') || prompt.history('overwrite').value != 'n'},
+        },
+        region: {
+            description: 'the AWS region this stack should be deployed to\n',
+            default: 'us-east-1',
             ask: () => {return !prompt.history('overwrite') || prompt.history('overwrite').value != 'n'},
         },
         domain: {
@@ -34,9 +45,11 @@ var configSchema = {
             ask: () => {return !prompt.history('overwrite') || prompt.history('overwrite').value != 'n'},
         },
         rootobject: {
-            description: 'default object returned at root domain (e.g. index.html)\noptional',
+            description: 'default object returned at root domain (enter double-quotes "" if not desired)',
             required: false,
+            default: 'index.html',
             ask: () => {return !prompt.history('overwrite') || prompt.history('overwrite').value != 'n'},
+            before: (value) => {return value == '""' || value == '\'\'' ? "" : value}
         }
     }
 }
@@ -53,7 +66,7 @@ prompt.get(configSchema, (err, result) => {
     delete result.overwrite
 
     fs.writeFileSync(fName, JSON.stringify(result, null, '\t'))
-    console.log('configuration complete:')
-    console.log('the following values were set in config.json:\n')
+    console.log('Configuration complete!')
+    console.log('The following values were set in config.json:\n')
     console.log(JSON.stringify(result, null, '\t'))
 })

@@ -10,17 +10,17 @@ Resources:
       DistributionConfig:
         Enabled: true
         PriceClass: PriceClass_100
-        DefaultRootObject: index.html
+        DefaultRootObject: ${self:custom.rootObject}
         Logging:
           Bucket: !GetAtt SiteLogBucket.DomainName
           IncludeCookies: true
-          Prefix: logs/cloudfront/
+          Prefix: ${self:custom.logPrefix}
         DefaultCacheBehavior:
           CachePolicyId: 658327ea-f89d-4fab-a63d-7e88639e58f6 # Managed-CachingOptimized
           ViewerProtocolPolicy: redirect-to-https
           TargetOriginId: ${self:service}-s3-origin
         Aliases:
-          - averydl.com
+          - ${self:custom.domain}
         ViewerCertificate:
           AcmCertificateArn: ${certificate:${self:custom.customCertificate.certificateName}:CertificateArn}
           SslSupportMethod: sni-only
