@@ -24,6 +24,10 @@ Resources:
         ViewerCertificate:
           AcmCertificateArn: ${certificate:${self:custom.customCertificate.certificateName}:CertificateArn}
           SslSupportMethod: sni-only
+        CustomErrorResponses: # redirect to home page if users refresh/get 403 error
+          - ErrorCode: 403
+            ResponseCode: 200
+            ResponsePagePath: /${self:custom.rootObject}
         Origins:
           - Id: ${self:service}-s3-origin
             DomainName: !GetAtt SiteBucket.DomainName
