@@ -1,7 +1,12 @@
 #!/usr/bin/env bash
 
-# read domain name from json config
-domain=$(cat config.json | grep "\"domain\": \"([^s]*)\"" -o)
+# read json key/value pairs to variables
+# (keys: servicename, region, domain, zoneid, logprefix, rootobject)
+for kv in $(sed -n 's/"\(.*\)": "\(.*\)",\{0,1\}/\1:\2/p' config.json); do
+	k=${kv%:*}
+	v=${kv#*:}
+	printf -v "$k" "%s" "$v"
+done
 
 # create new directories
 mkdir -p logs/zipped/	  # zipped log files; synced to AWS s3 bucket
@@ -16,10 +21,7 @@ for f in $(find logs/zipped -name "*.gz" -exec basename {} \;); do
 done
 
 # sync zipped log files from s3 log bucket
-####################################################################################
-#### ENTER YOUR DOMAIN AND LOG SUFFIX BELOW IN PLACE OF <example.com> AND <suffix> 
-####################################################################################
-aws s3 sync s3://<example.com>-logs/<suffix>/ logs/zipped --exclude "*" --include "*.gz"
+aws s3 sync s3://$domain-logs/$logprefix logs/zipped --exclude "*" --include "*.gz"
 
 duplicates=0
 newfiles=0

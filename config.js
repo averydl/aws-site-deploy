@@ -40,8 +40,10 @@ var configSchema = {
             ask: () => {return !prompt.history('overwrite') || prompt.history('overwrite').value != 'n'},
         },
         logprefix: {
-            description: 'prefix added to logs written to log bucket (e.g. logs/)\noptional',
+            description: 'prefix added to logs written to log bucket; must end with "/" (e.g. logs/)',
             required: false,
+            pattern: '.*/',
+            default: '/',
             ask: () => {return !prompt.history('overwrite') || prompt.history('overwrite').value != 'n'},
         },
         rootobject: {
